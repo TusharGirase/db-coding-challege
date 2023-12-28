@@ -19,9 +19,12 @@ public class AccountsService {
 	@Getter
 	private final AccountsRepository accountsRepository;
 
+	private final NotificationService notificationService;
+
 	@Autowired
-	public AccountsService(AccountsRepository accountsRepository) {
+	public AccountsService(AccountsRepository accountsRepository, NotificationService notificationService) {
 		this.accountsRepository = accountsRepository;
+		this.notificationService = notificationService;
 	}
 
 	public void createAccount(Account account) {
@@ -62,7 +65,10 @@ public class AccountsService {
 				accountsRepository.updateBalance(accountTo.getAccountId(), accountToUpdatedBalance);
 			}
 		}
-
+		notificationService.notifyAboutTransfer(accountFrom,
+				"Your account is debited with amount " + moneyTransferRequest.getAmount());
+		notificationService.notifyAboutTransfer(accountTo,
+				"Your account is credited with amount " + moneyTransferRequest.getAmount());
 		return MoneyTransferResult.SUCCESS;
 	}
 }
